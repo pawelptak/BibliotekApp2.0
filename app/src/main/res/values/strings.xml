@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">BibliotekApp</string>
+    <string name="logo_description">App logo.</string>
+    <string name="searchbutton_description">Magnifier (lupa)</string>
+    <string name="searchbar_text">Wyszukaj książkę</string>
+    <string name="filterbutton_description">Filtrowanie</string>
+    <string name="menu_title">Sortuj według:</string>
+    <string name="relevance_button">Trafność</string>
+    <string name="newest_button">Ostatnio dodane</string>
+    <string name="bookcover_description">Book cover</string>
+    <string name="sample_text">Sample text</string>
+    <string name="notfound_description">Image shown when search item not found rozumiesz</string>
+    <string name="notfound_text">Nie znaleziono szukanej frazy :(</string>
+
+    <string name="loremipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Nunc ac dui vel leo varius euismod. Donec dolor eros, dignissim ac metus ut,
+        condimentum auctor ligula. Mauris vel mauris a sem dictum euismod ut dignissim sem.
+        In hac habitasse platea dictumst. Curabitur et pellentesque magna.
+        In ac ante et neque placerat egestas. Donec suscipit magna in massa fermentum semper.
+        Nulla mauris ipsum, finibus eu lobortis vel, elementum eu libero.
+        Donec eleifend dolor at tortor placerat euismod. Nullam fermentum egestas elit,
+        ut posuere nunc ultrices nec. Nulla elementum diam sed ex accumsan vestibulum.</string>
+
+    <string name="rating_text">Ocena</string>
+    <string name="rating">4.0</string>
+
+    <string name="opinions_title">Opinie</string>
+    <string name="ratings_number">(ocen: 420)</string>
+    <string name="pageicon_description">icon of a page</string>
+    <string name="pricetag_description">icon of a pricetag</string>
+    <string name="star_description">a rating star</string>
+</resources>

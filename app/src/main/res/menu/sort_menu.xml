@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content">
+
+    <item
+        android:id="@+id/menuTitle"
+        android:checkable="false"
+
+        android:enabled="false"
+        android:title="@string/menu_title" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/relevanceButton"
+            android:orderInCategory="100"
+            android:title="@string/relevance_button" />
+
+        <item
+            android:id="@+id/lastButton"
+            android:orderInCategory="100"
+            android:title="@string/newest_button" />
+    </group>
+</menu>
