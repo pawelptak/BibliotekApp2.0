@@ -3,6 +3,6 @@
     <color name="colorPrimary">#336CBD</color>
     <color name="colorPrimaryDark">#203D5F</color>
     <color name="colorAccent">#336CBD</color>
-    <color name="searchBarBackground">#e3e3e3</color>
     <color name="icons">#606060</color>
+    <color name="searchBarBackground">#e3e3e3</color>
 </resources>

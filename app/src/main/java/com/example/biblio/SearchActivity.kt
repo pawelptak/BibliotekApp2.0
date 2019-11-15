@@ -3,7 +3,6 @@ package com.example.bibliotekapp
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.ContextMenu
@@ -13,23 +12,26 @@ import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.biblio.BookActivity
+import com.example.biblio.MyAdapter
 import com.google.gson.GsonBuilder
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_search.*
 import okhttp3.*
 import java.io.IOException
-
-
-
-var il: ItemList ?=null //zmienna globalna czyli gownianie, ale nie umiem inaczej przekazac ItemListy do BookActivity
+import java.io.Serializable
+import java.util.concurrent.TimeUnit
 
 class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
-    override fun startActivity(int: Int) { //funkcja odpowiadajaca na wcisniecie elementu
+    var il: ItemList ?=null
+
+    override fun startActivity(position: Int) { //funkcja odpowiadajaca na wcisniecie elementu
       //  Toast.makeText(this,"DD",Toast.LENGTH_SHORT).show()
         val nowaAktywnosc = Intent(applicationContext, BookActivity::class.java)
-        Toast.makeText(this, int.toString(), Toast.LENGTH_SHORT).show()
-        nowaAktywnosc.putExtra("itemPos", int)
+      //  Toast.makeText(this, position.toString(), Toast.LENGTH_SHORT).show()
+        nowaAktywnosc.putExtra("itemPos", position)
+        nowaAktywnosc.putExtra("itemList",il)
         startActivity(nowaAktywnosc)
 
     }
@@ -46,24 +48,27 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
             this.supportActionBar!!.hide()
         } catch (e: NullPointerException) {
         }
-
-
         searchRecyclerView.layoutManager = LinearLayoutManager(this)
 
         val bundle: Bundle? = intent.extras
-        val message = bundle!!.getString("searched_word")
-            .toString() //przechwytuje z ekranu glownego slowo wpisane w searchbar
+        val message = bundle?.getString("searched_word").toString() //przechwytuje z ekranu glownego slowo wpisane w searchbar
 
-        fetchJsonString(message, sorting)
+       if(message!="null") {
+           fetchJsonString(message, sorting)
+           searchBar2.setText(message)
+       }
 
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //zeby nie wyskakiwala od razu klawiatura
-        searchBar2.setText(message)
+
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) //zeby nie wyskakiwala od razu klawiatura
+
         searchBar2.requestFocus()
 
 
         searchButton2.setOnClickListener {
             fetchJsonString(searchBar2.text.toString(), sorting)
             searchBar2.hideKeyboard()
+            searchBarContainer2.isPressed = true
+            searchBarContainer2.isPressed = false
         }
 
         searchBar2.setOnEditorActionListener { _, actionId, _ -> //zatwierdzanie 'enterem'
@@ -73,12 +78,30 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
             }
             false
         }
+
+        searchBar2.setOnFocusChangeListener { view: View, b: Boolean ->
+            searchBarContainer2.isPressed = true //animacja searchbara przy nacisnieciu
+            searchBarContainer2.isPressed = false
+        }
+
+        searchBar2.setOnClickListener {
+            searchBarContainer2.isPressed = true
+            searchBarContainer2.isPressed = false
+        }
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
 
     //pobiera jsona z Books Api wykorzystujac OkHttp
-    fun fetchJsonString(phrase: String, order: String) {
+    fun fetchJsonString(phrase: String, order: String){
         //2 mozliwosci order: relevance, newest
+
+        runOnUiThread {
+            progressBar.visibility = View.VISIBLE
+            searchRecyclerView.visibility=View.GONE
+        }
 
         @Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER") //zeby nie bylo warna ze niepotrzebna zmienna. potrzebna.
         var jsonString = "cos poszlo nie tak"
@@ -97,13 +120,15 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
         Log.e("url", url) //wypisuje przechwycony json w logach
         val request = Request.Builder().url(url).build()
 
-        val client = OkHttpClient()
-
+        val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).build()
 
         client.newCall(request).enqueue(object :
             Callback { //to jest osobny watek z tego co rozumiem, dlatego pobieranie z neta danych nie zatrzymuje apki
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("JSON_ERROR", "Nie udalo sie uzyskac odpowiedzi")
+                searchRecyclerView.adapter = NotFoundAdapter(false)
+                searchRecyclerView.visibility=View.VISIBLE
+                progressBar.visibility=View.GONE
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -113,23 +138,28 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
                 Log.d("pies",jsonString)
                 val gson = GsonBuilder().create() //gson tworzy klasy ItemList, Item, itd. z jsona
                 val itemList = gson.fromJson(jsonString, ItemList::class.java)
+                il=itemList
                 if(itemList.totalItems==0){
                     runOnUiThread {
-                        searchRecyclerView.adapter = NotFoundAdapter()
+                        searchRecyclerView.adapter = NotFoundAdapter(true)
+                        searchRecyclerView.visibility=View.VISIBLE
+                        progressBar.visibility=View.GONE
                     }
                 }
                 else {
                     runOnUiThread {
                            searchRecyclerView.adapter= MyAdapter(itemList, this@SearchActivity) //dzieki temu wyswietlaja sie poszczegolne elementy na ekranie
-                           il=itemList
-
+                        searchRecyclerView.visibility=View.VISIBLE
+                        progressBar.visibility=View.GONE
                     }
                 }
-                progressBar.visibility=View.INVISIBLE
 
             }
+
         })
     }
+
+
 
     fun View.hideKeyboard() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -187,12 +217,26 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
 
 
 //klasy zgodne z jsonem z Google Api: ItemList - lista wszystkiego, Item - element listy, Book - ksiazka, ImageLink - tablica linkow do okladek
-class ItemList(val kind: String, val totalItems: Int, val items: Array<Item>)
+class ItemList(
+    val totalItems: Int, val items: Array<Item>
+): Serializable
 
-class Item(val kind: String, val id: String, val etag: String, val selfLink: String, val volumeInfo: Book)
+class Item(
+    val id: String,
+    val volumeInfo: Book
+): Serializable
 
-class Book(val title: String, val authors: Array<String>, val imageLinks: ImageLink, val description: String,
-           val averageRating: Double, val ratingsCount: Int, val publisher: String, val retailPrice: Price, val pageCount: Int)
-class Price(val amount: Double, val currencyCode: String)
+class Book(
+    val title: String,
+    val authors: Array<String>,
+    val imageLinks: ImageLink,
+    val description: String,
+    val averageRating: Double,
+    val ratingsCount: Int,
+    val publisher: String,
+    val pageCount: Int
+): Serializable
 
-class ImageLink(val smallThumbnail: String)
+class ImageLink(
+    val smallThumbnail: String
+): Serializable

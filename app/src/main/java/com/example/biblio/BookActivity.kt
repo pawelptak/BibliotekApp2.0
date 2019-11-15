@@ -1,26 +1,39 @@
-package com.example.bibliotekapp
+package com.example.biblio
 
-import android.content.ClipDescription
-import android.content.ContentValues
-import android.database.sqlite.SQLiteDatabase
-import android.media.Rating
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
+import android.util.Log
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.biblio.DataBaseHelper
-import com.example.biblio.TableInfo
-import com.example.bibliotekapp.MyAdapter.myClickListener
+import com.example.biblio.MyAdapter.myClickListener
+import com.example.bibliotekapp.Book
+import com.example.bibliotekapp.ItemList
+import com.example.bibliotekapp.MainActivity
+import com.example.bibliotekapp.R
+import com.google.gson.GsonBuilder
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_book.*
-import kotlinx.android.synthetic.main.activity_search.*
+import okhttp3.*
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 
-class BookActivity() : AppCompatActivity(),  myClickListener {
-    override fun startActivity(position: Int) {
+
+@Suppress("SENSELESS_COMPARISON")
+class BookActivity : AppCompatActivity(),  myClickListener {
+
+    var itemList: ItemList? = null
+
+    override fun startActivity(position: Int) { //nowa aktywnosc po wscisnieciu elemtu 'wiecej od autora'
+        val nowaAktywnosc = Intent(applicationContext, BookActivity::class.java)
+       // Toast.makeText(this, position.toString(), Toast.LENGTH_SHORT).show()
+        nowaAktywnosc.putExtra("itemPos", position)
+        nowaAktywnosc.putExtra("itemList",itemList)
+        startActivity(nowaAktywnosc)
 
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,17 +43,62 @@ class BookActivity() : AppCompatActivity(),  myClickListener {
             this.supportActionBar!!.hide()
         } catch (e: NullPointerException) {
         }
+      //  this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-
-        var pos: Int = intent.getIntExtra("itemPos", 0)
+        val pos: Int = intent.getIntExtra("itemPos", 0)
 
         bookRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) //to docelowo ma byc poziomo scrollowana lista innych ksiazek tego autora
-        bookRecyclerView.adapter=MyAdapter(il!!, this)
+
 
         var url = "no url"
-        //sprawdzam czy sa linki do okladek
-        if(il?.items?.get(pos)?.volumeInfo?.imageLinks !=null)  url = il!!.items[pos].volumeInfo.imageLinks.smallThumbnail
-        url=url.replace("http","https").replace("&edge=curl","")
+        var fetchedTitle = "[Brak tytułu]"
+        var fetchedAuthors = "[Brak autora]"
+        var firstAuthor = "[Brak autora]"
+        var fetchedPublisher = ""
+        var fetchedDescription = "Brak opisu."
+        var fetchedRating = "-"
+        var pages = "-"
+        var ratingCount = 0
+        var fetchedRatingCountString = "-"
+        // var fetchedPrice="N/A" //nie ma sensu ta cena bo zadna ksiazka nie ma jej wpisanej
+
+
+        if (intent.hasExtra("itemList")) {
+          itemList= intent.extras?.get("itemList") as ItemList
+        }
+
+        var thisBook:Book
+        if(itemList!=null) { //jesli ksiazka jest z listy wyszukiwania
+             thisBook= itemList!!.items[pos].volumeInfo
+        }else{ //jesli ksiazka jest z biblioteki (bazy danych)
+            val db = DataBaseHelper(this)
+            val bookList=db.readData()
+            thisBook=bookList[pos]
+            db.close()
+        }
+
+        val db = DataBaseHelper(this)
+        val isInLibrary=db.isAdded(thisBook)
+        db.close()
+        when(isInLibrary){ //ustawienie ikonki dodawania do biblioteki
+            true->addButton.setImageResource(R.drawable.addedlibrary_icon)
+            false->addButton.setImageResource(R.drawable.addlibrary_icon)
+        }
+
+
+        fetchedTitle=thisBook.title
+        if (thisBook.authors != null) {
+            fetchedAuthors = thisBook.authors.joinToString(", ")
+            firstAuthor = thisBook.authors[0]
+        }
+        if(thisBook.description != null) fetchedDescription=thisBook.description
+        if (thisBook.imageLinks != null) url=thisBook.imageLinks.smallThumbnail
+        if (thisBook.averageRating != null) fetchedRating=thisBook.averageRating.toString()
+        fetchedRatingCountString="(ocen: "+thisBook.ratingsCount.toString()+")"
+        pages=thisBook.pageCount.toString()
+        if(thisBook.publisher!= null) fetchedPublisher="Wydawnictwo: "+thisBook.publisher
+
+        url = url.replace("http", "https").replace("&edge=curl", "")
 
         //ustawiam okladke
         Picasso.with(bookViewCover.context)
@@ -48,81 +106,142 @@ class BookActivity() : AppCompatActivity(),  myClickListener {
             .placeholder(R.drawable.nocover)
             .into(bookViewCover)
 
-
-        var fetchedTitle="[Brak tytułu]"
-        var fetchedAuthor="[Brak autora]"
-        var fetchedPublisher=""
-        var fetchedDescription = "Brak opisu."
-        var fetchedRating="-"
-        val pages= il?.items?.get(pos)?.volumeInfo?.pageCount.toString()
-        var ratingCount =il?.items?.get(pos)?.volumeInfo?.ratingsCount
-        var fetchedRatingCountString="(ocen: "+ratingCount.toString()+")"
-       // var fetchedPrice="N/A" //nie ma sensu ta cena bo zadna ksiazka nie ma jej wpisanej, ale nie mam czym zapelnic miejsca
-
-
-
-        if (il?.items?.get(pos)?.volumeInfo?.title !=null) fetchedTitle = il!!.items[pos].volumeInfo.title
-
-
-        if (il?.items?.get(pos)?.volumeInfo?.authors !=null){
-            var i=0
-            fetchedAuthor=""
-            for (item in il!!.items[pos].volumeInfo.authors){
-                fetchedAuthor+=item
-                if(i!= il!!.items[pos].volumeInfo.authors.count()-1)fetchedAuthor+=", "
-                ++i
-
-            }
+        if(fetchedAuthors=="[Brak autora]") { //jesli nie ma autora to nie wyswietlaj wiecej ksiazek od autora
+            moreFromContainer.visibility= View.GONE
+            bookRecyclerView.visibility=View.GONE
+        }else{
+            fetchMoreFromAuthor(firstAuthor,fetchedTitle)
         }
 
-        if (il?.items?.get(pos)?.volumeInfo?.publisher !=null) fetchedPublisher ="Wydawnictwo: "+il!!.items[pos].volumeInfo.publisher
-        if (il?.items?.get(pos)?.volumeInfo?.description !=null) fetchedDescription = il!!.items[pos].volumeInfo.description
-        if (il?.items?.get(pos)?.volumeInfo?.averageRating !=null) fetchedRating = il!!.items[pos].volumeInfo.averageRating.toString()
-       // if (il?.items?.get(pos)?.volumeInfo?.retailPrice !=null) fetchedPrice = il!!.items[pos].volumeInfo.retailPrice.amount.toString()+" "+il!!.items[pos].volumeInfo.retailPrice.currencyCode
-
         bookViewTitle.text = fetchedTitle
-        bookViewAuthor.text=fetchedAuthor
+        bookViewAuthor.text=fetchedAuthors
+        bookViewAuthor2.text=firstAuthor
         bookViewPublisher.text=fetchedPublisher
         bookViewDescription.text= fetchedDescription
         rating.text=fetchedRating
         if(pages=="0")pageCount.text="N/A"
-            else pageCount.text=pages
+        else pageCount.text=pages
         numRatings.text=fetchedRatingCountString
 
-
-        addButton.setOnClickListener{
-            if (ratingCount != null) {
-                saveToDataBase(fetchedTitle, il!!.items[pos].volumeInfo.authors, url, fetchedPublisher, fetchedDescription, il!!.items[pos].volumeInfo.averageRating, ratingCount, il!!.items?.get(pos)?.volumeInfo?.pageCount )
+        bookViewDescription.post { //inaczej sie nie da wyciagnac liczby linii przed wyrenderowniem tekstu na ekran
+            kotlin.run {
+                val lines=bookViewDescription.lineCount
+                if(lines>6){ //jesli opis jest dluzszy niz 6 linii to nie pokazuje calego i mozna rozwijac
+                    bookViewDescription.setCollapseLines(6)
+                    bookViewDescription.setExpandEnabled(true)
+                    bookViewDescription.setExpand(false)
+                }
             }
         }
 
 
+        addButton.setOnClickListener{
+                   saveToDataBase(thisBook)
+        }
+
+        homeButton.setOnClickListener {
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            startActivity(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+
+        }
+
 
     }
 
-    fun saveToDataBase(title:String, authors: Array<String>, url: String, publisher: String, description: String, rating: Double, numRating: Int, pages: Int){
 
-        val dbHelper = DataBaseHelper(applicationContext)
-        val db = dbHelper.writableDatabase
-
-        val value = ContentValues()
-        value.put("title", title)
-
-        // value.put("authors", authors) //jak wlozyc tablice to bazy danych?
-
-        //value.put("imageLinks", url)
-
-        value.put("publisher", publisher)
-
-        value.put("description", description)
-
-        value.put("rating", rating)
-
-        value.put("ratingcount",numRating)
-
-        value.put("pagecount",pages)
-
-        db.insertOrThrow(TableInfo.TABLE_NAME, null, value)
+    override fun onSupportNavigateUp(): Boolean { //wraca do glownego ekranu po wcisnieciu strzalki
+        val intent = Intent(applicationContext, MainActivity::class.java)
+        startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+        return true
     }
+
+
+
+
+    fun saveToDataBase(book: Book){
+        val db = DataBaseHelper(this)
+        if(!db.isAdded(book)){
+            db.insertData(book)
+            addButton.setImageResource(R.drawable.addedlibrary_icon)
+        }else{
+            addButton.setImageResource(R.drawable.addlibrary_icon)
+            db.deleteData(book)
+        }
+        db.close()
+
+    }
+
+
+    private fun fetchMoreFromAuthor(author: String, title:String) {
+        runOnUiThread {
+            progressBar2.visibility = View.VISIBLE
+            bookRecyclerView.visibility=View.GONE
+            moreFromContainer.visibility= View.GONE
+        }
+        @Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER") //zeby nie bylo warna ze niepotrzebna zmienna. potrzebna.
+        var jsonString = "cos poszlo nie tak"
+
+
+        val url: String =
+            Uri.parse("https://www.googleapis.com/books/v1/volumes?") //zapytanie do bazy
+                .buildUpon()
+                .appendQueryParameter("q", "author:"+author) //+"-intitle:"+title -> niezbyt to chcialo dzialac
+        //-"+title+"+intitle:"
+              //  .appendQueryParameter("printType", "books")
+                .appendQueryParameter("key", "AIzaSyCplTkBpwcR-n4DseXuS7806HZcWfz08ms")
+                .build().toString()
+
+        Log.e("url", url) //wypisuje przechwycony json w logach
+        val request = Request.Builder().url(url).build()
+
+        val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).build()
+
+
+        client.newCall(request).enqueue(object :
+            Callback { //to jest osobny watek z tego co rozumiem, dlatego pobieranie z neta danych nie zatrzymuje apki
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("JSON_ERROR", "Nie udalo sie uzyskac odpowiedzi")
+                moreFromContainer.visibility= View.GONE
+                bookRecyclerView.visibility=View.GONE
+                progressBar2.visibility=View.GONE
+
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string()
+
+                jsonString = body.toString()
+                Log.d("pies",jsonString)
+                val gson = GsonBuilder().create() //gson tworzy klasy ItemList, Item, itd. z jsona
+                val list = gson.fromJson(jsonString, ItemList::class.java)
+                itemList=list //zmiena globalna = gowno
+                if(list.totalItems==0){ //to sie chyba nigdy nie stanie
+                    runOnUiThread {
+                        moreFromContainer.visibility= View.GONE
+                        bookRecyclerView.visibility=View.GONE
+                        progressBar2.visibility=View.GONE
+                    }
+                }
+                else {
+                    runOnUiThread {
+                        bookRecyclerView.adapter= MyAdapter(list, this@BookActivity) //dzieki temu wyswietlaja sie poszczegolne elementy na ekranie
+                        progressBar2.visibility=View.GONE
+                        bookRecyclerView.visibility=View.VISIBLE
+                        moreFromContainer.visibility= View.VISIBLE
+                    }
+                }
+
+
+            }
+        })
+    }
+
 
 }
+
+
+
+
+

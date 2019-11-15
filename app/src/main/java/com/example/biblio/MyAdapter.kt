@@ -1,10 +1,12 @@
-package com.example.bibliotekapp
+package com.example.biblio
 
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bibliotekapp.ItemList
+import com.example.bibliotekapp.R
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.list_element.view.*
 
@@ -18,10 +20,13 @@ class MyAdapter(val itemList: ItemList, val listener: myClickListener): Recycler
         val title= holder.view.title
         val author = holder.view.author
         val image = holder.view.cover
+        val rating = holder.view.ratingBar
+        val ratingText=holder.view.ratingBarText
 
         var url = "no url"
         var fetchedTitle="[Brak tytułu]"
         var fetchedAuthor="[Brak autora]"
+        var fetchedRating=0.0
 
         //sprawdzam czy jest tytul
         if (itemList.items[position].volumeInfo.title!=null) fetchedTitle =itemList.items[position].volumeInfo.title
@@ -33,10 +38,14 @@ class MyAdapter(val itemList: ItemList, val listener: myClickListener): Recycler
         //zamiana na https, bo inaczej obrazki w apce nie dzalaja, usuniecie edgecurl - bo tak ladniej wyglada
         url=url.replace("http","https").replace("&edge=curl","")
 
+        //sprawdzam czy jest ocena
+        if(itemList.items[position].volumeInfo.averageRating!=null) fetchedRating=itemList.items[position].volumeInfo.averageRating
+
         //ustawiam tekst dla elementow w list_element.xml
         title.setText(fetchedTitle)
         author.setText(fetchedAuthor)
-
+        rating.rating=fetchedRating.toFloat()
+        ratingText.text=fetchedRating.toString()
 
         //ustawiam okladke
         Log.e("e",url)
@@ -54,7 +63,7 @@ class MyAdapter(val itemList: ItemList, val listener: myClickListener): Recycler
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val wiersz = layoutInflater.inflate(R.layout.list_element, parent, false) //dostarczam xml
-        return MyViewHolder(wiersz, listener)
+        return MyViewHolder(wiersz)
     }
 
 
@@ -64,7 +73,7 @@ class MyAdapter(val itemList: ItemList, val listener: myClickListener): Recycler
         fun startActivity(position: Int)
     }
 
-    inner class MyViewHolder(val view: View, clickListener:myClickListener) : RecyclerView.ViewHolder(view) {
+    inner class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val item = view
         fun foo(){
             item.setOnClickListener{

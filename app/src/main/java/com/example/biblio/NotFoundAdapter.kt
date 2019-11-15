@@ -4,10 +4,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.not_found.view.*
 
-class NotFoundAdapter: RecyclerView.Adapter<MyViewHolder2>(){
+class NotFoundAdapter(hasConnection:Boolean): RecyclerView.Adapter<MyViewHolder2>(){
+    val connection=hasConnection
     override fun onBindViewHolder(holder: MyViewHolder2, position: Int) {
-
+        val textView=holder.view.notFoundText
+        val notfoundText="Sprawdź połączenie sieciowe"
+        if(!connection) textView.text=notfoundText
 
     }
 

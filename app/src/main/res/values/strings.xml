@@ -29,4 +29,6 @@
     <string name="pageicon_description">icon of a page</string>
     <string name="pricetag_description">icon of a pricetag</string>
     <string name="star_description">a rating star</string>
+    <string name="library_nobooks">Nie dodano jeszcze żadnych książek.</string>
+    <string name="search_books">Szukaj książek</string>
 </resources>

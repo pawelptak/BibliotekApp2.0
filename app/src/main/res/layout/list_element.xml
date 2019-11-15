@@ -53,6 +53,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sample_text" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+
+            <RatingBar
+                android:id="@+id/ratingBar"
+                style="@style/Widget.AppCompat.RatingBar.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="5dp"/>
+
+            <TextView
+                android:id="@+id/ratingBarText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0"
+                android:textSize="14sp" />
+        </LinearLayout>
+
     </LinearLayout>
 
 
