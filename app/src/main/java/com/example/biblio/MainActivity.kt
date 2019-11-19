@@ -6,11 +6,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.biblio.DataBaseHelper
 import com.example.biblio.LibraryActivity
 import com.google.gson.GsonBuilder
@@ -18,12 +21,11 @@ import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
 import java.io.IOException
-import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-import android.content.Context.INPUT_METHOD_SERVICE
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.app.ComponentActivity.ExtraData
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.view.inputmethod.InputMethodManager
+
+
 
 
 class MainActivity : AppCompatActivity()  {
@@ -101,7 +103,7 @@ class MainActivity : AppCompatActivity()  {
         }
 
 
-        reset.setOnClickListener {//czysci baze danych. funkcja do testow
+       reset.setOnClickListener {//czysci baze danych. funkcja do testow
             this.deleteDatabase(db.databaseName)
         }
 
@@ -195,6 +197,14 @@ class MainActivity : AppCompatActivity()  {
         }
 
     }
+
+    fun isKeyboardVisible(activity: MainActivity): Boolean{
+        val imm = activity
+            .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+        return imm.isAcceptingText
+    }
+
 
 
 }

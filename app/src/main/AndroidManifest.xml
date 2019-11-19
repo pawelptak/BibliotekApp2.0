@@ -23,7 +23,8 @@
         <activity android:name="com.example.biblio.LibraryActivity" />
         <activity android:name="com.example.biblio.BookActivity" />
         <activity android:name=".SearchActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

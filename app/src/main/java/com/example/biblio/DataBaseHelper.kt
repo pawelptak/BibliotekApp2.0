@@ -90,7 +90,7 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
             return false
         }
         else{
-            Toast.makeText(context,"Dodano do biblioteki", Toast.LENGTH_LONG).show()
+            Toast.makeText(context,"Dodano do biblioteki", Toast.LENGTH_SHORT).show()
             return true
         }
     }
