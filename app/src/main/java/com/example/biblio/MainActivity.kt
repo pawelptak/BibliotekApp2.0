@@ -87,10 +87,11 @@ class MainActivity : AppCompatActivity()  {
 
         addScanButton.setOnClickListener {
             dialogBox.visibility=View.GONE
-           // Toast.makeText(this,"Dodano do biblioteki", Toast.LENGTH_SHORT).show()
-
-            db.insertData(il!!.items[0].volumeInfo)
-
+            if(db.isAdded(il!!.items[0].volumeInfo)){
+                Toast.makeText(this,"Ta książka jest już w bibliotece", Toast.LENGTH_LONG).show()
+            }else{
+                db.insertData(il!!.items[0].volumeInfo)
+            }
         }
 
         cancelScanButton.setOnClickListener {
