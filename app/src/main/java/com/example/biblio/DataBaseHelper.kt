@@ -9,11 +9,13 @@ import android.provider.BaseColumns
 import android.widget.Toast
 import com.example.bibliotekapp.Book
 import com.example.bibliotekapp.ImageLink
+import com.example.bibliotekapp.Item
 import java.io.Serializable
 
 
-object TableInfo: BaseColumns{
+object TableInfo: BaseColumns{ //nazwy kolumn i nazwa tabeli
     const val TABLE_NAME="MyBooks"
+    const val TABLE_COLUMN_ID="id"
     const val TABLE_COLUMN_TITLE="title"
     const val TABLE_COLUMN_AUTHORS="authors"
     const val TABLE_COLUMN_DESCRIPTION="description"
@@ -25,10 +27,11 @@ object TableInfo: BaseColumns{
 
 }
 
-object  BasicCommand{
+object  BasicCommand{ //tworzenie bazy danych
     const val SQL_CREATE_TABLE =
         "CREATE TABLE ${TableInfo.TABLE_NAME} (" +
                 "${BaseColumns._ID} INTEGER PRIMARY KEY,"+
+                "${TableInfo.TABLE_COLUMN_ID} TEXT NOT NULL,"+
                 "${TableInfo.TABLE_COLUMN_TITLE} TEXT NOT NULL,"+
                 "${TableInfo.TABLE_COLUMN_AUTHORS} TEXT NOT NULL,"+
                 "${TableInfo.TABLE_COLUMN_DESCRIPTION} TEXT NOT NULL,"+
@@ -37,7 +40,7 @@ object  BasicCommand{
                 "${TableInfo.TABLE_COLUMN_RATINGCOUNT} INT NOT NULL,"+
                 "${TableInfo.TABLE_COLUMN_PUBLISHER} TEXT NOT NULL,"+
                 "${TableInfo.TABLE_COLUMN_PAGECOUNT} INT NOT NULL,"+
-                "CONSTRAINT name_unique UNIQUE (${TableInfo.TABLE_COLUMN_TITLE}))" //dzieki temu nie mozna dodac dwoch ksiazek o takim samym tytule
+                "CONSTRAINT name_unique UNIQUE (${TableInfo.TABLE_COLUMN_ID}))" //dzieki temu nie mozna dodac dwoch ksiazek o takim samym id
 
     const val SQL_DELETE_TABLE = "DROP TABLE IF EXISTS ${TableInfo.TABLE_NAME}"
 
@@ -47,7 +50,7 @@ object  BasicCommand{
 @Suppress("SENSELESS_COMPARISON")
 class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo.TABLE_NAME, null, 1), Serializable {
     override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL(BasicCommand.SQL_CREATE_TABLE)
+        db?.execSQL(BasicCommand.SQL_CREATE_TABLE) //tworzenie bazy danych
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -55,14 +58,16 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
         onCreate(db)
     }
 
-    fun insertData(book: Book):Boolean{
+    fun insertData(item: Item):Boolean{ //dodawanie danych do bazy
         val db = this.writableDatabase
+        val book=item.volumeInfo
+        val id=item.id
         val cv = ContentValues()
+        cv.put(TableInfo.TABLE_COLUMN_ID,id)
         cv.put(TableInfo.TABLE_COLUMN_TITLE, book.title)
 
-
         if(book.authors!=null){
-            val authors=book.authors.joinToString(", ")
+            val authors=book.authors.joinToString(", ") //zapisywanie autorow jako string oddzielony przecinkami
             cv.put(TableInfo.TABLE_COLUMN_AUTHORS,authors)
         }
         else cv.put(TableInfo.TABLE_COLUMN_AUTHORS,"[Brak autora]")
@@ -95,14 +100,15 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
         }
     }
 
-    fun readData() :MutableList<Book>{
-        val list:MutableList<Book> = ArrayList()
+    fun readData() :MutableList<Item>{ //odczytanie pozycji z bazy
+        val list:MutableList<Item> = ArrayList()
 
         val db = this.readableDatabase
         val query="Select * from "+TableInfo.TABLE_NAME
         val result=db.rawQuery(query,null)
         if(result.moveToFirst()){
             do{
+                val id = result.getString(result.getColumnIndex(TableInfo.TABLE_COLUMN_ID))
                 val title=result.getString(result.getColumnIndex(TableInfo.TABLE_COLUMN_TITLE))
                 val authorList= result.getString(result.getColumnIndex(TableInfo.TABLE_COLUMN_AUTHORS)).split(",").toTypedArray()
                 val imageLink = result.getString(result.getColumnIndex(TableInfo.TABLE_COLUMN_IMAGES))
@@ -114,7 +120,8 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
                 val pageCount=result.getInt(result.getColumnIndex(TableInfo.TABLE_COLUMN_PAGECOUNT))
 
                 val book=Book(title,authorList,imageObject,description,avgRating.toDouble(),ratingCount,publisher,pageCount)
-                list.add(book)
+                val item=Item(id,book)
+                list.add(item)
             }while (result.moveToNext())
         }
 
@@ -123,29 +130,17 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
         return list
     }
 
-    fun deleteData(book: Book){
-        var authors="[Brak autora]" //zbedna zmienna ale zostawilem
-        if(book.authors!=null){
-             authors=book.authors.joinToString(", ")
-            authors=authors.replace("'","''")
-        }
-        val title=book.title.replace("'","''") //byl problem z query jesli byl apostrof w tytule
+    fun deleteData(item: Item){ //usuwanie pozycji z bazy
         val db = this.readableDatabase
-        val query="Delete from "+TableInfo.TABLE_NAME+" where "+TableInfo.TABLE_COLUMN_TITLE+"='"+title+"'"
+        val query="Delete from "+TableInfo.TABLE_NAME+" where "+TableInfo.TABLE_COLUMN_ID+"='"+item.id+"'" //usuwam ksiazke o danym id
         db.execSQL(query)
         db.close()
         Toast.makeText(context,"Usunięto z biblioteki", Toast.LENGTH_SHORT).show()
     }
 
-    fun isAdded(book: Book):Boolean{
-        var authors="[Brak autora]" //zbedna zmienna ale zostawilem
-        if(book.authors!=null){
-            authors=book.authors.joinToString(", ")
-            authors=authors.replace("'","''")
-        }
-        val title=book.title.replace("'","''") //byl problem z query jesli byl apostrof w tytule
+    fun isAdded(item: Item):Boolean{ //sprawdzenie czy pozycja jest w bazie
         val db = this.readableDatabase
-        val query="Select 1 from "+TableInfo.TABLE_NAME+" where "+TableInfo.TABLE_COLUMN_TITLE+"='"+title+"'"
+        val query="Select 1 from "+TableInfo.TABLE_NAME+" where "+TableInfo.TABLE_COLUMN_ID+"='"+item.id+"'" //sprawdzam czy jest ksiazka o danym id
         val result=db.rawQuery(query,null)
         return result.count>0
     }

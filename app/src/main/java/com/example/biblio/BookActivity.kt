@@ -9,10 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.biblio.MyAdapter.myClickListener
-import com.example.bibliotekapp.Book
-import com.example.bibliotekapp.ItemList
-import com.example.bibliotekapp.MainActivity
-import com.example.bibliotekapp.R
+import com.example.bibliotekapp.*
 import com.google.gson.GsonBuilder
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_book.*
@@ -68,17 +65,20 @@ class BookActivity : AppCompatActivity(),  myClickListener {
         }
 
         var thisBook:Book
+        var thisItem:Item
         if(itemList!=null) { //jesli ksiazka jest z listy wyszukiwania
              thisBook= itemList!!.items[pos].volumeInfo
+             thisItem= itemList!!.items[pos]
         }else{ //jesli ksiazka jest z biblioteki (bazy danych)
             val db = DataBaseHelper(this)
             val bookList=db.readData()
-            thisBook=bookList[pos]
+            thisBook=bookList[pos].volumeInfo
+            thisItem=bookList[pos]
             db.close()
         }
 
         val db = DataBaseHelper(this)
-        val isInLibrary=db.isAdded(thisBook)
+        val isInLibrary=db.isAdded(thisItem)
         db.close()
         when(isInLibrary){ //ustawienie ikonki dodawania do biblioteki
             true->addButton.setImageResource(R.drawable.addedlibrary_icon)
@@ -136,7 +136,7 @@ class BookActivity : AppCompatActivity(),  myClickListener {
 
 
         addButton.setOnClickListener{
-                   saveToDataBase(thisBook)
+                   saveToDataBase(thisItem)
         }
 
         homeButton.setOnClickListener {
@@ -160,14 +160,14 @@ class BookActivity : AppCompatActivity(),  myClickListener {
 
 
 
-    fun saveToDataBase(book: Book){
+    fun saveToDataBase(item: Item){
         val db = DataBaseHelper(this)
-        if(!db.isAdded(book)){
-            db.insertData(book)
+        if(!db.isAdded(item)){
+            db.insertData(item)
             addButton.setImageResource(R.drawable.addedlibrary_icon)
         }else{
             addButton.setImageResource(R.drawable.addlibrary_icon)
-            db.deleteData(book)
+            db.deleteData(item)
         }
         db.close()
 

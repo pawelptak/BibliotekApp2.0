@@ -6,13 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bibliotekapp.Book
+import com.example.bibliotekapp.Item
 import com.example.bibliotekapp.ItemList
 import com.example.bibliotekapp.R
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.list_element.view.*
 
 
-class LibraryAdapter(val list: MutableList<Book>, val listener: myClickListener): RecyclerView.Adapter<LibraryAdapter.MyViewHolder>(){
+class LibraryAdapter(val list: MutableList<Item>, val listener: myClickListener): RecyclerView.Adapter<LibraryAdapter.MyViewHolder>(){
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
         holder.foo() //nie wiem jak ale dzieki temu mozna klikac na elementy
@@ -28,11 +29,11 @@ class LibraryAdapter(val list: MutableList<Book>, val listener: myClickListener)
         var fetchedAuthor="[Brak autora]"
         var fetchedRating=0.0
 
-        fetchedTitle=list[position].title
-        val authors=list[position].authors.joinToString(",")
+        fetchedTitle=list[position].volumeInfo.title
+        val authors=list[position].volumeInfo.authors.joinToString(",")
         fetchedAuthor=authors
 
-        val links=list[position].imageLinks.smallThumbnail
+        val links=list[position].volumeInfo.imageLinks.smallThumbnail
         url=links
         url = url.replace("http", "https").replace("&edge=curl", "")
 
@@ -43,7 +44,7 @@ class LibraryAdapter(val list: MutableList<Book>, val listener: myClickListener)
             .placeholder(R.drawable.nocover)
             .into(image)
 
-        fetchedRating=list[position].averageRating
+        fetchedRating=list[position].volumeInfo.averageRating
 
         title.text = fetchedTitle
         author.text = fetchedAuthor
