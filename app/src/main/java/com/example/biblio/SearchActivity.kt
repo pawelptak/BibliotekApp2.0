@@ -223,7 +223,8 @@ class ItemList(
 
 class Item(
     val id: String,
-    val volumeInfo: Book
+    val volumeInfo: Book,
+    val note: String
 ): Serializable
 
 class Book(

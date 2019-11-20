@@ -198,13 +198,6 @@ class MainActivity : AppCompatActivity()  {
 
     }
 
-    fun isKeyboardVisible(activity: MainActivity): Boolean{
-        val imm = activity
-            .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
-        return imm.isAcceptingText
-    }
-
 
 
 }

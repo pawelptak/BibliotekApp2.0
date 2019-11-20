@@ -24,6 +24,7 @@ object TableInfo: BaseColumns{ //nazwy kolumn i nazwa tabeli
     const val TABLE_COLUMN_RATINGCOUNT="ratingcount"
     const val TABLE_COLUMN_PUBLISHER="publisher"
     const val TABLE_COLUMN_PAGECOUNT="pagecount"
+    const val TABLE_COLUMN_NOTE="note"
 
 }
 
@@ -40,6 +41,7 @@ object  BasicCommand{ //tworzenie bazy danych
                 "${TableInfo.TABLE_COLUMN_RATINGCOUNT} INT NOT NULL,"+
                 "${TableInfo.TABLE_COLUMN_PUBLISHER} TEXT NOT NULL,"+
                 "${TableInfo.TABLE_COLUMN_PAGECOUNT} INT NOT NULL,"+
+                "${TableInfo.TABLE_COLUMN_NOTE} TEXT NOT NULL,"+
                 "CONSTRAINT name_unique UNIQUE (${TableInfo.TABLE_COLUMN_ID}))" //dzieki temu nie mozna dodac dwoch ksiazek o takim samym id
 
     const val SQL_DELETE_TABLE = "DROP TABLE IF EXISTS ${TableInfo.TABLE_NAME}"
@@ -89,6 +91,8 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
 
         cv.put(TableInfo.TABLE_COLUMN_PAGECOUNT,book.pageCount)
 
+        cv.put(TableInfo.TABLE_COLUMN_NOTE,"")
+
         val result=db.insert(TableInfo.TABLE_NAME,null,cv)
         if(result==-1.toLong()){
             Toast.makeText(context,"Failed",Toast.LENGTH_LONG).show()
@@ -118,9 +122,10 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
                 val ratingCount=result.getInt(result.getColumnIndex(TableInfo.TABLE_COLUMN_RATINGCOUNT))
                 val publisher=result.getString(result.getColumnIndex(TableInfo.TABLE_COLUMN_PUBLISHER))
                 val pageCount=result.getInt(result.getColumnIndex(TableInfo.TABLE_COLUMN_PAGECOUNT))
+                val note=result.getString(result.getColumnIndex(TableInfo.TABLE_COLUMN_NOTE))
 
                 val book=Book(title,authorList,imageObject,description,avgRating.toDouble(),ratingCount,publisher,pageCount)
-                val item=Item(id,book)
+                val item=Item(id,book,note)
                 list.add(item)
             }while (result.moveToNext())
         }
@@ -143,6 +148,13 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
         val query="Select 1 from "+TableInfo.TABLE_NAME+" where "+TableInfo.TABLE_COLUMN_ID+"='"+item.id+"'" //sprawdzam czy jest ksiazka o danym id
         val result=db.rawQuery(query,null)
         return result.count>0
+    }
+
+    fun addNote(item:Item, note:String){
+        val db = this.writableDatabase
+        val query="Update "+TableInfo.TABLE_NAME+" set "+TableInfo.TABLE_COLUMN_NOTE+"='"+note+"' where "+TableInfo.TABLE_COLUMN_ID+"='"+item.id+"'"
+        db.execSQL(query)
+        db.close()
     }
 
 }

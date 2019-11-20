@@ -205,6 +205,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="RESET"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
 </LinearLayout>

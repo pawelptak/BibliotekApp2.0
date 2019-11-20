@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bibliotekapp.*
 import kotlinx.android.synthetic.main.activity_library.*
+import kotlinx.android.synthetic.main.library_element.*
 
 class LibraryActivity : AppCompatActivity(), LibraryAdapter.myClickListener {
 
@@ -34,6 +35,7 @@ class LibraryActivity : AppCompatActivity(), LibraryAdapter.myClickListener {
 
         if(libraryRecyclerView.adapter!!.itemCount==0) noBooksView.visibility= View.VISIBLE
         else noBooksView.visibility= View.GONE
+
     }
 
     override fun onResume() {
