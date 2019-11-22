@@ -1,12 +1,17 @@
 package com.example.biblio
 
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bibliotekapp.*
+import com.example.bibliotekapp.MainActivity
+import com.example.bibliotekapp.R
 import kotlinx.android.synthetic.main.activity_library.*
+
 
 class LibraryActivity : AppCompatActivity(), LibraryAdapter.myClickListener {
 
@@ -22,8 +27,13 @@ class LibraryActivity : AppCompatActivity(), LibraryAdapter.myClickListener {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_library)
-        this.supportActionBar?.title = "Biblioteka"
 
+        try { //wylacza titlebar
+            this.supportActionBar!!.hide()
+        } catch (e: NullPointerException) {
+        }
+        val typeface = Typeface.createFromAsset(assets, "fonts/BebasNeue.ttf") //font tytulu w titlebarze
+        toolbar2Title.typeface=typeface
         val db = DataBaseHelper(this)
         var bookList=db.readData()
         db.close()

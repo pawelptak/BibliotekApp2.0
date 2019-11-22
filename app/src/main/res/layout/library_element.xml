@@ -61,6 +61,8 @@
             android:orientation="horizontal">
 
             <ImageView
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
                 android:id="@+id/addNoteButton"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
