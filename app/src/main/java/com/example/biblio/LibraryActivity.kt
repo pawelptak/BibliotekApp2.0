@@ -3,12 +3,10 @@ package com.example.biblio
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bibliotekapp.*
 import kotlinx.android.synthetic.main.activity_library.*
-import kotlinx.android.synthetic.main.library_element.*
 
 class LibraryActivity : AppCompatActivity(), LibraryAdapter.myClickListener {
 
@@ -50,11 +48,13 @@ class LibraryActivity : AppCompatActivity(), LibraryAdapter.myClickListener {
     }
 
 
+    @Suppress("UNUSED_PARAMETER")
     fun goToMain(view: View) {
         val intent = Intent(applicationContext, MainActivity::class.java)
         intent.putExtra("getFocus",true)
         startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
+
 
 }

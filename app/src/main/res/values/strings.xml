@@ -31,4 +31,5 @@
     <string name="star_description">a rating star</string>
     <string name="library_nobooks">Nie dodano jeszcze żadnych książek.</string>
     <string name="search_books">Szukaj książek</string>
+    <string name="delete_book">Usuń z biblioteki</string>
 </resources>

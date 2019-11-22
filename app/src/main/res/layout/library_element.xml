@@ -28,7 +28,6 @@
             android:layout_height="match_parent"
             android:contentDescription="@string/bookcover_description"
             android:scaleType="centerCrop"
-
             tools:srcCompat="@tools:sample/avatars" />
     </com.jcminarro.roundkornerlayout.RoundKornerLinearLayout>
 
@@ -36,7 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp">
 
         <TextView
             android:id="@+id/title"
@@ -54,15 +54,47 @@
             android:layout_height="wrap_content"
             android:text="@string/sample_text" />
 
-        <EditText
-            android:id="@+id/note"
+        <LinearLayout
+            android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Notatka"
-            android:textSize="14sp"
-            android:layout_marginStart="-3dp"
-            android:inputType="text"
-            android:imeOptions="actionDone"/>
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/addNoteButton"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/note_icon"
+                android:visibility="visible"
+                android:tint="@color/icons"/>
+
+            <EditText
+                android:padding="10dp"
+                android:id="@+id/note"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Dodaj notatkę"
+                android:textColor="@color/icons"
+                android:imeOptions="actionDone"
+                android:layout_weight="1"
+                android:layout_marginStart="-4dp"
+                android:textSize="14sp"
+                android:maxLines="2"
+                android:maxLength="45"
+                android:scrollHorizontally="true"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:id="@+id/clearNoteButton"
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/trash_icon"
+                android:layout_gravity="center_vertical"
+                android:tint="@color/icons"
+                android:visibility="gone"/>
+        </LinearLayout>
 
 
     </LinearLayout>

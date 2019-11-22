@@ -55,7 +55,7 @@
             android:text="@string/sample_text" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="5dp">
@@ -72,9 +72,20 @@
                 android:id="@+id/ratingBarText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:text="0.0"
-                android:textSize="14sp" />
+                android:textSize="16sp"
+                android:layout_marginEnd="10dp"/>
+
+            <ImageView
+                android:id="@+id/addButton"
+                android:padding="5dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/addlibrary_icon"
+                android:tint="@color/icons" />
         </LinearLayout>
+
 
     </LinearLayout>
 

@@ -79,7 +79,7 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
             false
         }
 
-        searchBar2.setOnFocusChangeListener { view: View, b: Boolean ->
+        searchBar2.setOnFocusChangeListener { _: View, _: Boolean ->
             searchBarContainer2.isPressed = true //animacja searchbara przy nacisnieciu
             searchBarContainer2.isPressed = false
         }

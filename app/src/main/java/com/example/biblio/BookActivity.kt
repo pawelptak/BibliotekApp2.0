@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.biblio.MyAdapter.myClickListener
@@ -40,7 +39,6 @@ class BookActivity : AppCompatActivity(),  myClickListener {
             this.supportActionBar!!.hide()
         } catch (e: NullPointerException) {
         }
-      //  this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val pos: Int = intent.getIntExtra("itemPos", 0)
 
@@ -55,17 +53,14 @@ class BookActivity : AppCompatActivity(),  myClickListener {
         var fetchedDescription = "Brak opisu."
         var fetchedRating = "-"
         var pages = "-"
-        var ratingCount = 0
         var fetchedRatingCountString = "-"
-        // var fetchedPrice="N/A" //nie ma sensu ta cena bo zadna ksiazka nie ma jej wpisanej
-
 
         if (intent.hasExtra("itemList")) {
           itemList= intent.extras?.get("itemList") as ItemList
         }
 
-        var thisBook:Book
-        var thisItem:Item
+        val thisBook:Book
+        val thisItem:Item
         if(itemList!=null) { //jesli ksiazka jest z listy wyszukiwania
              thisBook= itemList!!.items[pos].volumeInfo
              thisItem= itemList!!.items[pos]
@@ -160,7 +155,7 @@ class BookActivity : AppCompatActivity(),  myClickListener {
 
 
 
-    fun saveToDataBase(item: Item){
+    private fun saveToDataBase(item: Item){
         val db = DataBaseHelper(this)
         if(!db.isAdded(item)){
             db.insertData(item)
@@ -188,8 +183,6 @@ class BookActivity : AppCompatActivity(),  myClickListener {
             Uri.parse("https://www.googleapis.com/books/v1/volumes?") //zapytanie do bazy
                 .buildUpon()
                 .appendQueryParameter("q", "author:"+author) //+"-intitle:"+title -> niezbyt to chcialo dzialac
-        //-"+title+"+intitle:"
-              //  .appendQueryParameter("printType", "books")
                 .appendQueryParameter("key", "AIzaSyCplTkBpwcR-n4DseXuS7806HZcWfz08ms")
                 .build().toString()
 

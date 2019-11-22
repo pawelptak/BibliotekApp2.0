@@ -17,11 +17,17 @@ class MyAdapter(val itemList: ItemList, val listener: myClickListener): Recycler
 
         holder.foo() //nie wiem jak ale dzieki temu mozna klikac na elementy
 
+        val db = DataBaseHelper(holder.view.context)
+        val isInLibrary=db.isAdded(itemList.items[position])
+        db.close()
+
         val title= holder.view.title
         val author = holder.view.author
         val image = holder.view.cover
         val rating = holder.view.ratingBar
         val ratingText=holder.view.ratingBarText
+        val addButton = holder.view.addButton
+        if(isInLibrary) addButton.setImageResource(R.drawable.addedlibrary_icon)
 
         var url = "no url"
         var fetchedTitle="[Brak tytułu]"
@@ -75,9 +81,22 @@ class MyAdapter(val itemList: ItemList, val listener: myClickListener): Recycler
 
     inner class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val item = view
+        val addButton=view.addButton
         fun foo(){
             item.setOnClickListener{
                 listener.startActivity(this.adapterPosition)
+            }
+            addButton.setOnClickListener {
+                val db = DataBaseHelper(view.context)
+                addButton.setImageResource(R.drawable.addedlibrary_icon)
+                if(!db.isAdded(itemList.items[this.adapterPosition])){
+                    db.insertData(itemList.items[this.adapterPosition])
+                    addButton.setImageResource(R.drawable.addedlibrary_icon)
+                }else{
+                    addButton.setImageResource(R.drawable.addlibrary_icon)
+                    db.deleteData(itemList.items[this.adapterPosition])
+                }
+                db.close()
             }
         }
     }
