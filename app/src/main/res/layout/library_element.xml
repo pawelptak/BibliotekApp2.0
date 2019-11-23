@@ -87,6 +87,18 @@
                 android:visibility="gone"/>
 
             <ImageView
+                android:paddingTop="7dp"
+                android:paddingBottom="7dp"
+                android:id="@+id/confirmNoteButton"
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/addedlibrary_icon_small"
+                android:layout_gravity="center_vertical"
+                android:tint="@color/icons"
+                android:visibility="gone" />
+
+            <ImageView
+
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 android:id="@+id/clearNoteButton"
@@ -96,6 +108,8 @@
                 android:layout_gravity="center_vertical"
                 android:tint="@color/icons"
                 android:visibility="gone"/>
+
+
         </LinearLayout>
 
 

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bibliotekapp.Item
 import com.example.bibliotekapp.R
@@ -91,6 +92,7 @@ class LibraryAdapter(val list: MutableList<Item>, val listener: myClickListener)
         val note = view.note
         val clearNoteBtn = view.clearNoteButton
         val addNoteBtn = view.addNoteButton
+        val confNoteBtn = view.confirmNoteButton
 
         fun initiateListeners(){
             item.setOnClickListener{
@@ -117,14 +119,27 @@ class LibraryAdapter(val list: MutableList<Item>, val listener: myClickListener)
                     db.addNote(list[this.adapterPosition],note.text.toString())
                     db.close()
                     note.clearFocus()
+                   // confNoteBtn.visibility=View.GONE
                 }
                 false
             }
 
+            confNoteBtn.setOnClickListener {
+                val db = DataBaseHelper(view.context)
+                db.addNote(list[this.adapterPosition],note.text.toString())
+                db.close()
+                note.onEditorAction(EditorInfo.IME_ACTION_DONE)
+                note.clearFocus()
+            }
+
             note.setOnFocusChangeListener { _, _ ->
-                 if(note.hasFocus())clearNoteBtn.visibility=View.VISIBLE //pokazuje przycisk usuwania notatki
+                 if(note.hasFocus()){
+                     clearNoteBtn.visibility=View.VISIBLE //pokazuje przycisk usuwania notatki
+                     confNoteBtn.visibility=View.VISIBLE  //pokazuje przycisk zatwierdzenia notatki
+                 }
                  else {
                      clearNoteBtn.visibility=View.GONE
+                     confNoteBtn.visibility=View.GONE
                      if(note.text.toString()==""){
                          note.visibility=View.GONE
                          addNoteBtn.visibility=View.VISIBLE
