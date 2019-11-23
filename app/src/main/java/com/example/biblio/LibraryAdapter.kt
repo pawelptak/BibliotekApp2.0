@@ -119,7 +119,6 @@ class LibraryAdapter(val list: MutableList<Item>, val listener: myClickListener)
                     db.addNote(list[this.adapterPosition],note.text.toString())
                     db.close()
                     note.clearFocus()
-                   // confNoteBtn.visibility=View.GONE
                 }
                 false
             }
@@ -138,11 +137,11 @@ class LibraryAdapter(val list: MutableList<Item>, val listener: myClickListener)
                      confNoteBtn.visibility=View.VISIBLE  //pokazuje przycisk zatwierdzenia notatki
                  }
                  else {
-                     clearNoteBtn.visibility=View.GONE
-                     confNoteBtn.visibility=View.GONE
+                     clearNoteBtn.visibility=View.GONE //ukrywa przycisk usuwania notatki
+                     confNoteBtn.visibility=View.GONE //ukrywa przycisk zatwierdzenia notatki
                      if(note.text.toString()==""){
-                         note.visibility=View.GONE
-                         addNoteBtn.visibility=View.VISIBLE
+                         note.visibility=View.GONE //ukrywa notatke
+                         addNoteBtn.visibility=View.VISIBLE //pokazuje przycisk dodawania notatki
                      }
 
                  }
