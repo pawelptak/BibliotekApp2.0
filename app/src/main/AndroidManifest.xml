@@ -15,20 +15,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity
-            android:name="com.journeyapps.barcodescanner.CaptureActivity"
-            android:screenOrientation="portrait"
-            tools:replace="android:screenOrientation"
-            android:stateNotNeeded="true"/>
-        <activity android:name="com.example.biblio.LibraryActivity" />
-        <activity android:name="com.example.biblio.BookActivity" />
-        <activity android:name=".SearchActivity" />
-        <activity android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize">
+        <activity android:name="com.example.biblio.SplashActivity"
+            android:theme="@style/SplashStart">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            android:stateNotNeeded="true"
+            tools:replace="android:screenOrientation" />
+        <activity android:name="com.example.biblio.LibraryActivity" />
+        <activity android:name="com.example.biblio.BookActivity" />
+        <activity android:name=".SearchActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize">
+
         </activity>
     </application>
 

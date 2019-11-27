@@ -12,4 +12,9 @@
     <style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
         <item name="android:background">#ffff</item>
     </style>
+
+
+    <style name="SplashStart" parent="AppTheme">
+        <item name="android:foreground">@drawable/splash_logo</item>
+    </style>
 </resources>

@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bibliotekapp.Item
 import com.example.bibliotekapp.R
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_library.*
+import kotlinx.android.synthetic.main.activity_library.view.*
 import kotlinx.android.synthetic.main.library_element.view.*
 import kotlinx.android.synthetic.main.list_element.view.author
 import kotlinx.android.synthetic.main.list_element.view.cover
@@ -38,7 +40,7 @@ class LibraryAdapter(val list: MutableList<Item>, val listener: myClickListener)
         var fetchedRating=0.0
 
         fetchedTitle=list[position].volumeInfo.title
-        val authors=list[position].volumeInfo.authors.joinToString(",")
+        val authors=list[position].volumeInfo.authors[0]
         fetchedAuthor=authors
 
         val links=list[position].volumeInfo.imageLinks.smallThumbnail
