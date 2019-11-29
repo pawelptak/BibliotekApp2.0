@@ -245,7 +245,7 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
 
 //klasy zgodne z jsonem z Google Api: ItemList - lista wszystkiego, Item - element listy, Book - ksiazka, ImageLink - tablica linkow do okladek
 /**
- * Lista znalezionych elementów. Zawiera tablicę obiektow klasy Item.
+ * Lista znalezionych elementów. Zawiera tablicę obiektow klasy Item. Implementuje interfejs Serializable, aby możliwe było przekazanie obiektu do innej aktywności.
  * @param totalItems Liczba elementów w liście
  * @param items Tablica obiektów klasy Item
  */
@@ -254,7 +254,7 @@ class ItemList(
 ): Serializable
 
 /**
- * Element listy ItemList
+ * Element listy ItemList. Implementuje interfejs Serializable, aby możliwe było przekazanie obiektu do innej aktywności.
  * @param id Numer ID elementu
  * @param volumeInfo Obiekt klasy Book - książka
  * @param note Notatka na temat książki. Dodawana przez użytkownika w bibliotece.
@@ -266,7 +266,7 @@ class Item(
 ): Serializable
 
 /**
- * Książka
+ * Książka. Implementuje interfejs Serializable, aby możliwe było przekazanie obiektu do innej aktywności.
  * @param title Tytuł
  * @param authors Autorzy
  * @param imageLinks Adresy url okładek. Obiekt klasy ImageLink
@@ -288,7 +288,7 @@ class Book(
 ): Serializable
 
 /**
- * Klasa zawierająca adresy URL okładek. Zawiera tylko jeden parametr, ponieważ większość książek posiada tylko miniaturkę okładki (smallThumbnail)
+ * Klasa zawierająca adresy URL okładek. Zawiera tylko jeden parametr, ponieważ większość książek posiada tylko miniaturkę okładki (smallThumbnail). Implementuje interfejs Serializable, aby możliwe było przekazanie obiektu do innej aktywności.
  * @param smallThumbnail Adres URL miniaturki okładki o niskiej rozdzielczości
  */
 class ImageLink(
