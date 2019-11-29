@@ -73,7 +73,13 @@ object TableInfo: BaseColumns{
 
 }
 
-object  BasicCommand{ //tworzenie bazy danych
+/**
+ * Obiekt zawierający podstawowe komendy dotyczące bazy danych (tworzenie i usuwanie bazy)
+ */
+object  BasicCommand{
+    /**
+     * Tworzenie bazy danych o kolumnach określonych w obiekcie TableInfo
+     */
     const val SQL_CREATE_TABLE =
         "CREATE TABLE ${TableInfo.TABLE_NAME} (" +
                 "${BaseColumns._ID} INTEGER PRIMARY KEY,"+
@@ -89,6 +95,9 @@ object  BasicCommand{ //tworzenie bazy danych
                 "${TableInfo.TABLE_COLUMN_NOTE} TEXT NOT NULL,"+
                 "CONSTRAINT name_unique UNIQUE (${TableInfo.TABLE_COLUMN_ID}))" //dzieki temu nie mozna dodac dwoch ksiazek o takim samym id
 
+    /**
+     * Usunięcie bazy danych
+     */
     const val SQL_DELETE_TABLE = "DROP TABLE IF EXISTS ${TableInfo.TABLE_NAME}"
 
 }
