@@ -1,4 +1,4 @@
-package com.example.biblio
+package com.example.bibliotekapp
 
 
 import android.content.ContentValues
@@ -12,18 +12,63 @@ import com.example.bibliotekapp.ImageLink
 import com.example.bibliotekapp.Item
 import java.io.Serializable
 
-
-object TableInfo: BaseColumns{ //nazwy kolumn i nazwa tabeli
+/**
+ * Obiekt zawierający nazwy kolumn oraz nazwę tabeli bazy danych
+ */
+object TableInfo: BaseColumns{
+    /**
+     * Nazwa tabeli bazy danych
+     */
     const val TABLE_NAME="MyBooks"
+
+    /**
+     * Id kolumny bazy danych
+     */
     const val TABLE_COLUMN_ID="id"
+
+    /**
+     * Tytuł książki
+     */
     const val TABLE_COLUMN_TITLE="title"
+
+    /**
+     * Autorzy książki
+     */
     const val TABLE_COLUMN_AUTHORS="authors"
+
+    /**
+     * Opis książki
+     */
     const val TABLE_COLUMN_DESCRIPTION="description"
+
+    /**
+     * Adresy url okładek książki
+     */
     const val TABLE_COLUMN_IMAGES="imagelinks"
+
+    /**
+     * Średnia ocena książki
+     */
     const val TABLE_COLUMN_RATING="rating"
+
+    /**
+     * Liczba ocen
+     */
     const val TABLE_COLUMN_RATINGCOUNT="ratingcount"
+
+    /**
+     * Wydawnictwo
+     */
     const val TABLE_COLUMN_PUBLISHER="publisher"
+
+    /**
+     * Liczba stron
+     */
     const val TABLE_COLUMN_PAGECOUNT="pagecount"
+
+    /**
+     * Notatka do książki
+     */
     const val TABLE_COLUMN_NOTE="note"
 
 }
@@ -48,19 +93,29 @@ object  BasicCommand{ //tworzenie bazy danych
 
 }
 
-
+/**
+ * Klasa odpowiadająca za obsługę bazy danych
+ * @property SQLiteOpenHelper Wykorzystuje bibliotekę SQLite
+ */
 @Suppress("SENSELESS_COMPARISON")
-class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo.TABLE_NAME, null, 1), Serializable {
+class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo.TABLE_NAME, null, 1) {
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL(BasicCommand.SQL_CREATE_TABLE) //tworzenie bazy danych
     }
 
+    /**
+     * Przy tworzeniu nowej bazy danych usuwa starą wersję bazy
+     */
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         db?.execSQL(BasicCommand.SQL_DELETE_TABLE)
         onCreate(db)
     }
 
-    fun insertData(item: Item):Boolean{ //dodawanie danych do bazy
+    /**
+     * Dodawanie książki do bazy danych
+     * @param item Obiekt klasy Item - dana książka
+     */
+    fun insertData(item: Item):Boolean{
         val db = this.writableDatabase
         val book=item.volumeInfo
         val id=item.id
@@ -80,7 +135,7 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
         if(book.imageLinks!=null){
             val links=book.imageLinks.smallThumbnail
             cv.put(TableInfo.TABLE_COLUMN_IMAGES,links)
-        }else cv.put(TableInfo.TABLE_COLUMN_IMAGES,"")
+        }else cv.put(TableInfo.TABLE_COLUMN_IMAGES,"no url")
 
         cv.put(TableInfo.TABLE_COLUMN_RATING,book.averageRating)
 
@@ -104,7 +159,11 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
         }
     }
 
-    fun readData() :MutableList<Item>{ //odczytanie pozycji z bazy
+    /**
+     * Odczytanie zawartości bazy danych
+     * @return Zwraca listę obiektów klasy Item - listę książek
+     */
+    fun readData() :MutableList<Item>{
         val list:MutableList<Item> = ArrayList()
 
         val db = this.readableDatabase
@@ -135,7 +194,11 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
         return list
     }
 
-    fun deleteData(item: Item){ //usuwanie pozycji z bazy
+    /**
+     * Usuwanie książki z bazy danych
+     * @param item Obiekt klasy Item, używany do określenia id elementu, który chcemy usunąć
+     */
+    fun deleteData(item: Item){
         val db = this.readableDatabase
         val query="Delete from "+TableInfo.TABLE_NAME+" where "+TableInfo.TABLE_COLUMN_ID+"='"+item.id+"'" //usuwam ksiazke o danym id
         db.execSQL(query)
@@ -143,13 +206,23 @@ class DataBaseHelper (var context: Context): SQLiteOpenHelper(context, TableInfo
         Toast.makeText(context,"Usunięto z biblioteki", Toast.LENGTH_SHORT).show()
     }
 
-    fun isAdded(item: Item):Boolean{ //sprawdzenie czy pozycja jest w bazie
+    /**
+     * Sprawdzenie czy książka o danym ID jest już w bazie danych
+     * @param item Obiekt klasy Item, używany do określenia id sprawdzanej książki
+     * @return Zwraca true lub false w zależności czy książka jest już w bazie danych
+     */
+    fun isAdded(item: Item):Boolean{
         val db = this.readableDatabase
         val query="Select 1 from "+TableInfo.TABLE_NAME+" where "+TableInfo.TABLE_COLUMN_ID+"='"+item.id+"'" //sprawdzam czy jest ksiazka o danym id
         val result=db.rawQuery(query,null)
         return result.count>0
     }
 
+    /**
+     * Dodawanie notatki o książce do bazy danych
+     * @param item Obiekt klasy Item, używany do określenia id elementu, do którego należy dodać notatkę
+     * @param note Treść notatki
+     */
     fun addNote(item:Item, note:String){
         val db = this.writableDatabase
         val query="Update "+TableInfo.TABLE_NAME+" set "+TableInfo.TABLE_COLUMN_NOTE+"='"+note+"' where "+TableInfo.TABLE_COLUMN_ID+"='"+item.id+"'"

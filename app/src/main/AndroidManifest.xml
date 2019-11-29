@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.example.biblio.SplashActivity"
+        <activity android:name="com.example.bibliotekapp.SplashActivity"
             android:theme="@style/SplashStart">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,8 +27,8 @@
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
-        <activity android:name="com.example.biblio.LibraryActivity" />
-        <activity android:name="com.example.biblio.BookActivity" />
+        <activity android:name="com.example.bibliotekapp.LibraryActivity" />
+        <activity android:name="com.example.bibliotekapp.BookActivity" />
         <activity android:name=".SearchActivity" />
         <activity
             android:name=".MainActivity"

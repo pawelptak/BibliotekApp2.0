@@ -1,4 +1,4 @@
-package com.example.biblio
+package com.example.bibliotekapp
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,9 +10,16 @@ import com.example.bibliotekapp.R
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.list_element.view.*
 
-
+/**
+ * Odpowiada za wyświetlanie odpowiedniej zawartości (tytułów, okładek, itd.) na liście wyszukanych książek
+ * @param itemList Lista znalezionych książek
+ * @param listener Pozwala na wciskanie elementów listy
+ */
 class MyAdapter(val itemList: ItemList, val listener: myClickListener): RecyclerView.Adapter<MyAdapter.MyViewHolder>(){
     @Suppress("SENSELESS_COMPARISON") //zeby nie bylo warningow do ifow
+    /**
+     * Funkcja przypisuje zawartość listy znalezionych książek (tytułów, okładek, itd.) do odpowiednich elementów na ekranie
+     */
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
         holder.foo() //nie wiem jak ale dzieki temu mozna klikac na elementy
@@ -62,10 +69,17 @@ class MyAdapter(val itemList: ItemList, val listener: myClickListener): Recycler
 
     }
 
+    /**
+     * Zwraca liczbę znalezionych elementów
+     * @return liczba elementów
+     */
     override fun getItemCount(): Int {
         return itemList.items.count()
     }
 
+    /**
+     * Funkcja przekazuje adapterowi wygląd jednej pozycji z listy (list_element.xml)
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val wiersz = layoutInflater.inflate(R.layout.list_element, parent, false) //dostarczam xml
@@ -73,7 +87,9 @@ class MyAdapter(val itemList: ItemList, val listener: myClickListener): Recycler
     }
 
 
-
+    /**
+     * Uruchamianie nowej aktywności po wciśnięciu elementu listy
+     */
     interface myClickListener
     {
         fun startActivity(position: Int)

@@ -14,8 +14,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.biblio.DataBaseHelper
-import com.example.biblio.LibraryActivity
 import com.google.gson.GsonBuilder
 import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.android.synthetic.main.activity_main.*
@@ -26,10 +24,18 @@ import androidx.core.app.ComponentActivity.ExtraData
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 
-
+/**
+ * Menu główne aplikacji. Umożliwia wyszukiwanie książek, skanowanie nr ISBN oraz dostęp do biblioteki
+ */
 
 class MainActivity : AppCompatActivity()  {
+    /**
+     * Zmienna przechowująca bazę danych aplikacji (bibliotekę książek)
+     */
     val db = DataBaseHelper(this)
+    /**
+     * Zmienna przechowująca listę elementów otrzymaną od funkcji fetchISBN(). Zawiera 1 element - zeskanowaną książkę. Przekazywana jest do bazy danych aby zapisać zeskanowaną książkę.
+     */
     var il: ItemList ?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,6 +116,9 @@ class MainActivity : AppCompatActivity()  {
 
     }
 
+    /**
+     * Wyszukiwanie wpisanego tytułu. Uruchamia nową aktywność - SearchActivity
+     */
     fun search(){
 
             val nowaAktywnosc = Intent(applicationContext, SearchActivity::class.java)
@@ -117,13 +126,19 @@ class MainActivity : AppCompatActivity()  {
             startActivity(nowaAktywnosc)
     }
 
+    /**
+     *  Funkcja uruchamia skaner kodów kreskowych
+     */
     fun initScan(){
         IntentIntegrator(this).initiateScan()
     }
 
+    /**
+     *  Wyszukiwanie w api książki o podanym numerze ISBN. Pobiera JSON i zapisuje go jako obiekt typu ItemList do zmiennej il.
+     *
+     *@param isbn kod ISBN w postaci string
+     */
     fun fetchISBN(isbn: String) {
-
-
         @Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER") //zeby nie bylo warna ze niepotrzebna zmienna. potrzebna.
         var jsonString = "cos poszlo nie tak"
 
@@ -181,6 +196,9 @@ class MainActivity : AppCompatActivity()  {
         })
     }
 
+    /**
+     *  Funkcja obsługująca zeskanowane przy pomocy skanera dane. Uruchamia funkcję fetchISBN jeśli zeskanowano jakieś dane.
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = IntentIntegrator.parseActivityResult(requestCode,resultCode, data)
         if (result!=null){

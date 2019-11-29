@@ -1,4 +1,4 @@
-package com.example.biblio
+package com.example.bibliotekapp
 
 import android.content.Context
 import android.text.InputType
@@ -22,7 +22,16 @@ import kotlinx.android.synthetic.main.list_element.view.cover
 import kotlinx.android.synthetic.main.list_element.view.title
 
 
+/**
+ * Odpowiada za wyświetlanie odpowiedniej zawartości (tytułów, okładek, itd.) w bibliotece zapisanych książek.
+ * @param list Lista książek zapisanych w bazie danych
+ * @param listener Pozwala na wciskanie elementów listy
+ */
 class LibraryAdapter(val list: MutableList<Item>, val listener: myClickListener): RecyclerView.Adapter<LibraryAdapter.MyViewHolder>(){
+
+    /**
+     * Funkcja przypisuje zawartość listy zapisanych książek (tytułów, okładek, itd.) do odpowiednich elementów na ekranie
+     */
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
         holder.initiateListeners() //nie wiem jak ale dzieki temu mozna klikac na elementy
@@ -44,16 +53,17 @@ class LibraryAdapter(val list: MutableList<Item>, val listener: myClickListener)
         fetchedAuthor=authors
 
         val links=list[position].volumeInfo.imageLinks.smallThumbnail
-        url=links
+       if(links!="") url=links
         url = url.replace("http", "https").replace("&edge=curl", "")
 
         //ustawiam okladke
+
         Log.e("e",url)
+
         Picasso.with(image.context)
             .load(url)
             .placeholder(R.drawable.nocover)
             .into(image)
-
        // fetchedRating=list[position].volumeInfo.averageRating
 
         title.text = fetchedTitle
@@ -67,10 +77,17 @@ class LibraryAdapter(val list: MutableList<Item>, val listener: myClickListener)
 
     }
 
+    /**
+     * Zwraca liczbę elementów w bibliotece
+     * @return liczba elementów w bibliotece
+     */
     override fun getItemCount(): Int {
         return list.count()
     }
 
+    /**
+     * Funkcja przekazuje adapterowi wygląd jednej pozycji z listy (library_element.xml)
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val wiersz = layoutInflater.inflate(R.layout.library_element, parent, false) //dostarczam xml
@@ -78,13 +95,18 @@ class LibraryAdapter(val list: MutableList<Item>, val listener: myClickListener)
     }
 
 
-
+    /**
+     * Uruchamianie nowej aktywności po wciśnięciu elementu w bibliotece
+     */
     interface myClickListener
     {
         fun startActivity(position: Int)
     }
 
-    fun EditText.setDoneButton() { //pozwala na zatwierdzanie enterem tekstu o wielu liniach
+    /**
+     * Pozwala na zatwierdzanie enterem tekstu o wielu liniach (notatek)
+     */
+    fun EditText.setDoneButton() {
         imeOptions = EditorInfo.IME_ACTION_DONE
         setRawInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
     }

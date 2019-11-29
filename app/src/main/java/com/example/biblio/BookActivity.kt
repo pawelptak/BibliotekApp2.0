@@ -1,4 +1,4 @@
-package com.example.biblio
+package com.example.bibliotekapp
 
 import android.content.Intent
 import android.net.Uri
@@ -7,8 +7,6 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.biblio.MyAdapter.myClickListener
-import com.example.bibliotekapp.*
 import com.google.gson.GsonBuilder
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_book.*
@@ -18,10 +16,20 @@ import java.util.concurrent.TimeUnit
 
 
 @Suppress("SENSELESS_COMPARISON")
-class BookActivity : AppCompatActivity(),  myClickListener {
+/**
+ * Sczegółowe informacje o danej książce
+ */
+class BookActivity : AppCompatActivity(), MyAdapter.myClickListener {
 
+    /**
+     * Zmienna przechowująca listę elementów otrzymaną z SearchActivity. Używana do wyświetlenia informacji o odpowiedniej książce.
+     */
     var itemList: ItemList? = null
 
+    /**
+     * Włącza nową aktywność - BookActivity (zawierającą więcej informacji o książce) po wciśnięciu danej pozycji z listy 'Więcej od autora'
+     * @param item Indeks wciśniętej pozycji na liście
+     */
     override fun startActivity(position: Int) { //nowa aktywnosc po wscisnieciu elemtu 'wiecej od autora'
         val nowaAktywnosc = Intent(applicationContext, BookActivity::class.java)
        // Toast.makeText(this, position.toString(), Toast.LENGTH_SHORT).show()
@@ -88,6 +96,7 @@ class BookActivity : AppCompatActivity(),  myClickListener {
         }
         if(thisBook.description != null) fetchedDescription=thisBook.description
         if (thisBook.imageLinks != null) url=thisBook.imageLinks.smallThumbnail
+        val pies=url
         if (thisBook.averageRating != null) fetchedRating=thisBook.averageRating.toString()
         fetchedRatingCountString="(ocen: "+thisBook.ratingsCount.toString()+")"
         pages=thisBook.pageCount.toString()
@@ -144,14 +153,6 @@ class BookActivity : AppCompatActivity(),  myClickListener {
 
 
     }
-
-
-    override fun onSupportNavigateUp(): Boolean { //wraca do glownego ekranu po wcisnieciu strzalki
-        val intent = Intent(applicationContext, MainActivity::class.java)
-        startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-        return true
-    }
-
 
 
 

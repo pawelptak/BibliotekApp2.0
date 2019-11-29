@@ -1,4 +1,4 @@
-package com.example.biblio
+package com.example.bibliotekapp
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +8,9 @@ import android.view.WindowManager
 import com.example.bibliotekapp.MainActivity
 import com.example.bibliotekapp.R
 
+/**
+ * Logo aplikacji wyświetlane przy jej uruchomieniu (rozruchu)
+ */
 class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

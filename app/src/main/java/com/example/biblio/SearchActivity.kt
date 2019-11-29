@@ -14,8 +14,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.biblio.BookActivity
-import com.example.biblio.MyAdapter
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.activity_search.*
 import okhttp3.*
@@ -23,10 +21,20 @@ import java.io.IOException
 import java.io.Serializable
 import java.util.concurrent.TimeUnit
 
+/**
+ * Lista książek pasujących do wyszukanej frazy
+ */
 class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
+    /**
+     * Zmienna przechowująca listę elementów otrzymaną od funkcji fetchJsonString(). Przekazywana jest do BookActivity w celu wyświetlenie informacji o odpowiedniej książce.
+     */
     var il: ItemList ?=null
 
-    override fun startActivity(position: Int) { //funkcja odpowiadajaca na wcisniecie elementu
+    /**
+     * Włącza nową aktywność - BookActivity (zawierającą więcej informacji o książce) po wciśnięciu danej pozycji z listy
+     * @param item Indeks wciśniętej pozycji na liście
+     */
+    override fun startActivity(position: Int) {
       //  Toast.makeText(this,"DD",Toast.LENGTH_SHORT).show()
         val nowaAktywnosc = Intent(applicationContext, BookActivity::class.java)
       //  Toast.makeText(this, position.toString(), Toast.LENGTH_SHORT).show()
@@ -36,7 +44,9 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
 
     }
 
-
+    /**
+     * Aktualnie wybrany tryb sortowania. Domyślnie "releveace" - wg trafności. Przekazywany jako paramter do funkcji fetchJsonString()
+     */
     var sorting = "relevance"
 
 
@@ -94,9 +104,12 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
         super.onResume()
     }
 
-    //pobiera jsona z Books Api wykorzystujac OkHttp
+    /**
+     * Funkcja pobiera JSON z Google Books Api przy pomocy biblioteki OkHttp i zapisuje go do obiektu klasy ItemList.
+     * @param phrase Wyszukiwana fraza
+     * @param order Sortowanie. Dwie możliwości: "relevance" - najtrafniejsze, "newest" - najnowsze
+     */
     fun fetchJsonString(phrase: String, order: String){
-        //2 mozliwosci order: relevance, newest
 
         runOnUiThread {
             progressBar.visibility = View.VISIBLE
@@ -160,16 +173,23 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
     }
 
 
-
+    /**
+     * Funkcja chowa systemową klawiaturę
+     */
     fun View.hideKeyboard() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(windowToken, 0)
     }
 
 
-    //obsluga menu sortowania (z tutorialu na yt jakiegos chinola)
+    /**
+     * Aktualnie wybrana w menu sortowania pozycja. 1 - wg trafności, 2 - od najnowszych
+     */
     var itemSelection = 1 //aktualnie wybrany tryb sortowania (trafnosc)
 
+    /**
+     * Funkcja odpowiada za aktualny wygląd menu sortowania w zależności od wybranego trybu sortowania
+     */
     override fun onCreateContextMenu(
         menu: ContextMenu?,
         v: View?,
@@ -186,6 +206,10 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
         }
     }
 
+    /**
+     * Obsługa wyboru opcji w menu sortowania
+     * @param item Funkcja przyjmuje jako parametr obiekt klasy MenuItem - element menu.
+     */
     override fun onContextItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.relevanceButton -> {
@@ -209,6 +233,9 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
         return super.onContextItemSelected(item)
     }
 
+    /**
+     * Wyświetlanie menu sortowania. Funkcja uruchamiana jest po wciśnięciu odpowiedniego przycisku na ekranie.
+     */
     fun showSortMenu(v: View){
         registerForContextMenu(v)
         openContextMenu(v)
@@ -217,16 +244,38 @@ class SearchActivity : AppCompatActivity(), MyAdapter.myClickListener  {
 
 
 //klasy zgodne z jsonem z Google Api: ItemList - lista wszystkiego, Item - element listy, Book - ksiazka, ImageLink - tablica linkow do okladek
+/**
+ * Lista znalezionych elementów. Zawiera tablicę obiektow klasy Item.
+ * @param totalItems Liczba elementów w liście
+ * @param items Tablica obiektów klasy Item
+ */
 class ItemList(
     val totalItems: Int, val items: Array<Item>
 ): Serializable
 
+/**
+ * Element listy ItemList
+ * @param id Numer ID elementu
+ * @param volumeInfo Obiekt klasy Book - książka
+ * @param note Notatka na temat książki. Dodawana przez użytkownika w bibliotece.
+ */
 class Item(
     val id: String,
     val volumeInfo: Book,
     val note: String
 ): Serializable
 
+/**
+ * Książka
+ * @param title Tytuł
+ * @param authors Autorzy
+ * @param imageLinks Adresy url okładek. Obiekt klasy ImageLink
+ * @param description Opis
+ * @param averageRating Średnia ocena
+ * @param ratingsCount Liczba ocen
+ * @param publisher Wydawnictwo
+ * @param pageCount Liczba stron
+ */
 class Book(
     val title: String,
     val authors: Array<String>,
@@ -238,6 +287,10 @@ class Book(
     val pageCount: Int
 ): Serializable
 
+/**
+ * Klasa zawierająca adresy URL okładek. Zawiera tylko jeden parametr, ponieważ większość książek posiada tylko miniaturkę okładki (smallThumbnail)
+ * @param smallThumbnail Adres URL miniaturki okładki o niskiej rozdzielczości
+ */
 class ImageLink(
     val smallThumbnail: String
 ): Serializable
